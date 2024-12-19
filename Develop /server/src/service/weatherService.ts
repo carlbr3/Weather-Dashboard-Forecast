@@ -20,8 +20,9 @@ class WeatherService {
   private apiKey: string;
 
   constructor() {
-    this.baseURL = 'https://api.openweathermap.org/data/2.5/';
-    this.apiKey = process.env.OPENWEATHER_API_KEY || '';}
+    this.baseURL = 'https://api.openweathermap.org/data/2.5/forecast?lat={lat}&lon={lon}&appid={apiKey}';
+    this.apiKey = process.env.OPENWEATHER_API_KEY || '';
+  }
   // TODO: Define the baseURL, API key, and city name properties
   private async fetchLocationData(query: string): Promise<Coordinates> {
     const response = await axios.get(`${this.baseURL}weather?q=${query}&appid=${this.apiKey}`);
@@ -35,7 +36,7 @@ class WeatherService {
     };
   }
   // TODO: Create buildGeocodeQuery method
-  private buildGeocodeQuery(): string {
+  private buildGeocodeQuery(city: string): string {
     return `${this.baseURL}geocode/json?address=${city}&key=${this.apiKey}`;
   }
   // TODO: Create buildWeatherQuery method
@@ -43,9 +44,19 @@ class WeatherService {
     return `${this.baseURL}weather?lat=${coordinates.lat}&lon=${coordinates.lon}&appid=${this.apiKey}`;
   }
   // TODO: Create fetchAndDestructureLocationData method
-  private async fetchAndDestructureLocationData() {
-    const response = await axios.get(this.buildGeocodeQuery());
-    return this.destructureLocationData(response.data.results[0].geometry.location);
+  private async fetchAndDestructureLocationData(city: string): Promise<Coordinates> {
+    try {
+      const url = this.buildGeocodeQuery(city);
+      const response = await axios.get(url);
+      if (response.data && response.data.results && response.data.results.length > 0) {
+        return this.destructureLocationData(response.data.results[0].geometry.location);
+      } else {
+        throw new Error('Invalid response');
+      }
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
   }
   // TODO: Create fetchWeatherData method
   private async fetchWeatherData(coordinates: Coordinates): Promise<Weather> {
@@ -54,7 +65,7 @@ class WeatherService {
     return this.parseCurrentWeather(response.data);
   }
   // TODO: Build parseCurrentWeather method
-  private parseCurrentWeather(data:any): Weather {
+  private parseCurrentWeather(data: any): Weather {
     return {
       temperature: data.main.temp,
       description: data.weather[0].description,
@@ -62,28 +73,36 @@ class WeatherService {
     };
   }
   // TODO: Complete buildForecastArray method
-private buildForecastArray(currentWeather: Weather, weatherData: any[]) {
-  return {
-    temperature: currentWeather.temperature,
-    description: currentWeather.description,
-    cityName: currentWeather.cityName,
-    forecast: weatherData.map((data) => ({
-      date: data.dt_txt,
-      temperature: data.main.temp,
-      description: data.weather[0].description,
-    })),
+  private buildForecastArray(currentWeather: Weather, weatherData: any[]) {
+    return {
+      temperature: currentWeather.temperature,
+      description: currentWeather.description,
+      cityName: currentWeather.cityName,
+      forecast: weatherData.map((data) => ({
+        date: data.dt_txt,
+        temperature: data.main.temp,
+        description: data.weather[0].description,
+      })),
+    }
   }
-}
   // TODO: Complete getWeatherForCity method
   async getWeatherForCity(city: string): Promise<Weather> {
     try {
       const coordinates = await this.fetchLocationData(city);
-      const weather= await this.fetchWeatherData(coordinates);
-      return weather;
+      const weather = await this.fetchWeatherData(coordinates);
+      const forecast = await this.fetchForecastData(coordinates);
+      return this.buildForecastArray(weather, forecast);
     } catch (error) {
       console.error(error);
       throw error;
-    }  
+    }
   }
- }
+
+  // TODO: Create fetchForecastData method
+  private async fetchForecastData(coordinates: Coordinates): Promise<any[]> {
+    const url = `${this.baseURL}forecast?lat=${coordinates.lat}&lon=${coordinates.lon}&appid=${this.apiKey}`;
+    const response = await axios.get(url);
+    return response.data.list;
+  }
+}
 export default new WeatherService();
