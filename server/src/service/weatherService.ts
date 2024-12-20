@@ -35,10 +35,12 @@ class WeatherService {
       lon: locationData.lon,
     };
   }
+
   // TODO: Create buildWeatherQuery method
   private buildWeatherQuery(coordinates: Coordinates): string {
     return `${this.baseURL}weather?lat=${coordinates.lat}&lon=${coordinates.lon}&appid=${this.apiKey}`;
   }
+
   // TODO: Create fetchWeatherData method
   private async fetchWeatherData(coordinates: Coordinates): Promise<Weather> {
     const url = this.buildWeatherQuery(coordinates);
