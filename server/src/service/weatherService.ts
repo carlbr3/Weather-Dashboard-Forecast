@@ -35,28 +35,9 @@ class WeatherService {
       lon: locationData.lon,
     };
   }
-  // TODO: Create buildGeocodeQuery method
-  private buildGeocodeQuery(city: string): string {
-    return `${this.baseURL}geocode/json?address=${city}&key=${this.apiKey}`;
-  }
   // TODO: Create buildWeatherQuery method
   private buildWeatherQuery(coordinates: Coordinates): string {
     return `${this.baseURL}weather?lat=${coordinates.lat}&lon=${coordinates.lon}&appid=${this.apiKey}`;
-  }
-  // TODO: Create fetchAndDestructureLocationData method
-  private async fetchAndDestructureLocationData(city: string): Promise<Coordinates> {
-    try {
-      const url = this.buildGeocodeQuery(city);
-      const response = await axios.get(url);
-      if (response.data && response.data.results && response.data.results.length > 0) {
-        return this.destructureLocationData(response.data.results[0].geometry.location);
-      } else {
-        throw new Error('Invalid response');
-      }
-    } catch (error) {
-      console.error(error);
-      throw error;
-    }
   }
   // TODO: Create fetchWeatherData method
   private async fetchWeatherData(coordinates: Coordinates): Promise<Weather> {
