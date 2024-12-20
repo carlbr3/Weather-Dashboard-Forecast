@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { get } from 'http';
+
 const router = Router();
 
 // import HistoryService from '../../service/historyService.js';
@@ -18,10 +18,10 @@ router.post('/', (req, res) => {
 });
 
 // TODO: GET search history
-router.get('/history', async (req, res) => {});
+router.get('/history', async (_req, _res) => {});
 
 // * BONUS TODO: DELETE city from search history
-router.delete('/history/:id', async (req, res) => {});
+router.delete('/history/:id', async (_req, _res) => {});
 
 export default router;
 import axios from 'axios';
