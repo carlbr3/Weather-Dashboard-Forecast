@@ -2,7 +2,7 @@ import dayjs, { type Dayjs } from 'dayjs';
 import dotenv from 'dotenv';
 dotenv.config();
 
-// DONE: Define an interface for the Coordinates object
+
 interface Coordinates {
   name: string;
   lat: number;
@@ -11,7 +11,7 @@ interface Coordinates {
   state: string;
 };
 
-// DONE: Define a class for the Weather object
+
 class Weather {
   constructor(
     public city: string,
@@ -24,9 +24,9 @@ class Weather {
   ) {}
 };
 
-// DONE: Complete the WeatherService class
+
 class WeatherService {
-  // DONE: Define the baseURL, API key, and city name properties
+
   private baseURL?: string;
   private apiKey?: string;
   private city = '';
@@ -35,7 +35,7 @@ class WeatherService {
     this.apiKey = process.env.API_KEY || '';
   };
 
-  // DONE: Create fetchLocationData method
+
   private async fetchLocationData(query: string) {
     try {
       if (!this.baseURL || !this.apiKey) {
@@ -52,7 +52,7 @@ class WeatherService {
     }
   };
 
-  // DONE: Create destructureLocationData method
+ 
   private destructureLocationData(locationData: Coordinates): Coordinates {
     if(!locationData) {
       throw new Error('City not found');
@@ -69,7 +69,7 @@ class WeatherService {
     return coordinates;
   };
 
-  // DONE: Create buildGeocodeQuery method
+
   private buildGeocodeQuery(): string {
     const geocodeQuery = `${this.baseURL}/geo/1.0/direct?q=${this.city}&limit=1&appid=${this.apiKey}`;
     console.log(`geocodeQuery Returned: ${geocodeQuery}`);
@@ -115,7 +115,7 @@ class WeatherService {
     };
   };
 
-  // DONE: Build parseCurrentWeather method
+ 
   private parseCurrentWeather(response: any) {
     const parsedDate = dayjs.unix(response.dt).format('M/D/YYYY');
     const currentWeather = new Weather(
